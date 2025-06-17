@@ -3,7 +3,7 @@
 <main style="margin-left: 2em">
     <h2>Create Account</h2>
 
-    <form method="POST" action="validate.php">
+    <form method="POST" action="/create/register">
         <input type="hidden" name="action" value="signup">
 
         <label>Select Username:</label><br>

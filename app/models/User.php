@@ -18,7 +18,7 @@ class User {
       return $rows;
     }
 
-    public function authenticate($username, $password) {
+    public function authenticate($username, $password): array {
         /*
          * if username and password good then
          * $this->auth = true;
@@ -38,7 +38,7 @@ class User {
   			die;
   		} else {
     			if(isset($_SESSION['failedAuth'])) {
-    				$_SESSION['failedAuth'] ++; //increment
+    				$_SESSION['failedAuth'] ++;
     			} else {
     				$_SESSION['failedAuth'] = 1;
     			}
@@ -47,17 +47,16 @@ class User {
   		}
     }
 
-  public function create(string $username, string $password): array
-  {
-      // 1️⃣ Normalise + basic validation
+  
+  public function create(string $username, string $password): array {
       $username = strtolower(trim($username));
 
       if (!$this->isPasswordStrong($password)) {
           return [ 'ok' => false,
-                   'msg'=> 'Password must be ≥8 chars and contain upper- and lowercase letters.' ];
+                   'msg'=> 'Password must be ≥ 8 chars and contain both upper and lowercase letters.' ];
       }
 
-      // 2️⃣ Check if username already exists
+      // Check if username already exists
       $db   = db_connect();
       $stmt = $db->prepare('SELECT 1 FROM users WHERE username = :u LIMIT 1');
       $stmt->execute([':u' => $username]);
@@ -66,12 +65,11 @@ class User {
           return [ 'ok' => false, 'msg' => 'Username already taken.' ];
       }
 
-      // 3️⃣ Insert new user (hashed password!)
+      // Insert new user (hashed password!)
       $hash = password_hash($password, PASSWORD_DEFAULT);
       $stmt = $db->prepare(
-          'INSERT INTO users (username, password) VALUES (:u, :p)'
-      );
-      $stmt->execute([':u' => $username, ':p' => $hash]);
+          'INSERT INTO users (username, password) VALUES (?, ?)');
+      $stmt->execute([$username, $hash]);
 
       return [ 'ok' => true, 'msg' => 'Account created – please log in.' ];
   }
