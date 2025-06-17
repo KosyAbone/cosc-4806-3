@@ -31,20 +31,24 @@ class User {
           $rows = $statement->fetch(PDO::FETCH_ASSOC);
   		
   		if (password_verify($password, $rows['password'])) {
+            $this->logAttempt($username, 'success');
+            echo "[debug] logged GOOD attempt<br>";  
   			$_SESSION['auth'] = 1;
   			$_SESSION['username'] = ucwords($username);
   			unset($_SESSION['failedAuth']);
   			header('Location: /home');
   			die;
   		} else {
-    			if(isset($_SESSION['failedAuth'])) {
-    				$_SESSION['failedAuth'] ++;
-    			} else {
-    				$_SESSION['failedAuth'] = 1;
-    			}
+            $this->logAttempt($username, 'fail');
+            echo "[debug] logged BAD attempt<br>";  
+            if(isset($_SESSION['failedAuth'])) {
+                $_SESSION['failedAuth'] ++;
+            } else {
+                $_SESSION['failedAuth'] = 1;
+            }
             $_SESSION['auth_msg'] = 'Username or password incorrect.'; 
-  			header('Location: /login');
-  			die;
+            header('Location: /login');
+            die;
   		}
     }
 
