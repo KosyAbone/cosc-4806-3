@@ -1,6 +1,6 @@
 <?php require_once 'app/views/templates/headerPublic.php'?>
 
-<main style="text-align: center">
+<main style="margin-left: 2em">
     <h2>Create Account</h2>
 
     <form method="POST" action="validate.php">
@@ -33,3 +33,5 @@
 
     <p><a href="index.php">Back to Home</a></p>
 </main>
+
+<?php require 'app/views/templates/footer.php'; ?>
