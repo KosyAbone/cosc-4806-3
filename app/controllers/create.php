@@ -3,8 +3,12 @@
 class Create extends Controller {
    
     public function index(){
-        $this->view('create/index'); 
+        $flash = $_SESSION['auth_msg'] ?? null;
+        unset($_SESSION['auth_msg']);
+        require 'app/views/create/index.php';
+        // $this->view('create/index', ['flash' => $flash]);
     }
+
 
     public function register() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -13,7 +17,7 @@ class Create extends Controller {
         }
 
         $username        = trim($_POST['username'] ?? '');
-        $password        = $_POST['password']        ?? '';
+        $password        = $_POST['password'] ?? '';
         $confirmPassword = $_POST['confirm_password'] ?? '';
 
         if ($password !== $confirmPassword) {
@@ -22,16 +26,13 @@ class Create extends Controller {
             exit;
         }
 
-        $user    = $this->model('User');
-        $result  = $user->create($username, $password);
+        $user   = $this->model('User');
+        $result = $user->create($username, $password);
 
         $_SESSION['auth_msg'] = $result['msg'];
 
-        if ($result['ok']) {
-            header('Location: /login');
-        } else {
-            header('Location: /create');
-        }
+        header('Location: ' . ($result['ok'] ? '/login' : '/create'));
+        
         exit;
     }
 }

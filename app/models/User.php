@@ -51,9 +51,9 @@ class User {
   public function create(string $username, string $password): array {
       $username = strtolower(trim($username));
 
-      if (!$this->isPasswordStrong($password)) {
-          return [ 'ok' => false,
-                   'msg'=> 'Password must be ≥ 8 chars and contain both upper and lowercase letters.' ];
+      [$ok, $msg] = $this->validatePassword($password);
+      if (!$ok) {
+          return ['ok' => false, 'msg' => $msg];
       }
 
       // Check if username already exists
@@ -71,13 +71,20 @@ class User {
           'INSERT INTO users (username, password) VALUES (?, ?)');
       $stmt->execute([$username, $hash]);
 
-      return [ 'ok' => true, 'msg' => 'Account created – please log in.' ];
+      return [ 'ok' => true, 'msg' => 'Account created. Proceed to log in.' ];
   }
 
-  private function isPasswordStrong(string $pw): bool{
-      return strlen($pw) >= 8 &&
-             preg_match('/[A-Z]/', $pw) &&
-             preg_match('/[a-z]/', $pw);
-  }
+    private function validatePassword(string $pw): array {
+        if (strlen($pw) < 8) {
+            return [false, 'Password must be at least 8 characters long.'];
+        }
+        if (!preg_match('/[A-Z]/', $pw)) {
+            return [false, 'Password must include at least one uppercase letter.'];
+        }
+        if (!preg_match('/[a-z]/', $pw)) {
+            return [false, 'Password must include at least one lowercase letter.'];
+        }
+        return [true, ''];
+    }
 
 }
