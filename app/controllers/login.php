@@ -3,7 +3,10 @@
 class Login extends Controller {
 
     public function index() {
-	    $this->view('login/index');
+			$flash = $_SESSION['auth_msg'] ?? null;
+			unset($_SESSION['auth_msg']);
+			require 'app/views/login/index.php';
+	    // $this->view('login/index');
     }
     
     public function verify(){
@@ -11,7 +14,12 @@ class Login extends Controller {
 			$password = $_REQUEST['password'];
 		
 			$user = $this->model('User');
-			$user->authenticate($username, $password); 
+			$result = $user->authenticate($username, $password); 
+
+			$_SESSION['auth_msg'] = $result['msg'];
+
+			header('Location: ' . ($result['ok'] ? '/home' : '/login'));
+			exit;
     }
 
 }

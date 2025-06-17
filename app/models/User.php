@@ -42,6 +42,7 @@ class User {
     			} else {
     				$_SESSION['failedAuth'] = 1;
     			}
+            $_SESSION['auth_msg'] = 'Username or password incorrect.'; 
   			header('Location: /login');
   			die;
   		}
