@@ -31,16 +31,14 @@ class User {
           $rows = $statement->fetch(PDO::FETCH_ASSOC);
   		
   		if (password_verify($password, $rows['password'])) {
-            $this->logAttempt($username, 'success');
-            echo "[debug] logged GOOD attempt<br>";  
+            $this->logAttempt($username, 'good');
   			$_SESSION['auth'] = 1;
   			$_SESSION['username'] = ucwords($username);
   			unset($_SESSION['failedAuth']);
   			header('Location: /home');
   			die;
   		} else {
-            $this->logAttempt($username, 'fail');
-            echo "[debug] logged BAD attempt<br>";  
+            $this->logAttempt($username, 'bad'); 
             if(isset($_SESSION['failedAuth'])) {
                 $_SESSION['failedAuth'] ++;
             } else {
@@ -92,12 +90,25 @@ class User {
         }
         return [true, ''];
     }
+    
 
     private function logAttempt(string $username, string $outcome): void {
         $db = db_connect();
         $db->prepare(
             'INSERT INTO login_log (username, outcome) VALUES (?, ?)'
         )->execute([$username, $outcome]);
+    }
+    
+
+    private function badCountLastMinute(string $username): int {
+        $db = db_connect();
+        $stmt = $db->prepare(
+            'SELECT COUNT(*) FROM login_log
+             WHERE username = ? AND outcome = "bad"
+               AND logged_at >= (NOW() - INTERVAL 60 SECOND)'
+        );
+        $stmt->execute([$username]);
+        return (int) $stmt->fetchColumn();
     }
 
 }
