@@ -75,6 +75,7 @@ class User {
       return [ 'ok' => true, 'msg' => 'Account created. Proceed to log in.' ];
   }
 
+    
     private function validatePassword(string $pw): array {
         if (strlen($pw) < 8) {
             return [false, 'Password must be at least 8 characters long.'];
@@ -86,6 +87,13 @@ class User {
             return [false, 'Password must include at least one lowercase letter.'];
         }
         return [true, ''];
+    }
+
+    private function logAttempt(string $username, string $outcome): void {
+        $db = db_connect();
+        $db->prepare(
+            'INSERT INTO login_log (username, outcome) VALUES (?, ?)'
+        )->execute([$username, $outcome]);
     }
 
 }
