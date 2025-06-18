@@ -19,19 +19,10 @@ class User {
     }
 
     public function authenticate($username, $password): array {
-        /*
-         * if username and password good then
-         * $this->auth = true;
-         */
-  		$username = strtolower($username);
-        //echo '[debug] badCountLastMinute = ' .
-        $this->badCountLastMinute($username) . '<br>';
-        if ($this->badCountLastMinute($username) >= 3) {
-            $_SESSION['locked_until'] = time() + 60;  
-            $_SESSION['auth_msg'] = 'Over 3 attempts. Locked for 60 seconds.';
-            header('Location: /login'); die;
-        }
         
+  		$username = strtolower($username);
+        $this->badCountLastMinute($username) . '<br>';
+         
   		$db = db_connect();
           $statement = $db->prepare("select * from users WHERE username = :name;");
           $statement->bindValue(':name', $username);
@@ -48,17 +39,18 @@ class User {
   			die;
   		} else {
             $this->logAttempt($username, 'bad'); 
-            if(isset($_SESSION['failedAuth'])) {
-                $_SESSION['failedAuth'] ++;
-            } else {
-                $_SESSION['failedAuth'] = 1;
-            }
-            $_SESSION['auth_msg'] = 'Username or password incorrect.'; 
-            header('Location: /login');
-            die;
-  		}
-    }
+            $badCount = $this->badCountLastMinute($username);
 
+            if ($badCount >= 3) {  // lock on 3rd failure
+                $_SESSION['locked_until'] = time() + 60;
+                $_SESSION['auth_msg']     = 'Over 3 attempts. Locked for 60 seconds.';
+            } else {
+                $_SESSION['auth_msg']     = 'Username or password incorrect.';
+            }
+
+            header('Location: /login'); die;
+        }
+    }
   
   public function create(string $username, string $password): array {
       $username = strtolower(trim($username));
@@ -108,7 +100,6 @@ class User {
              VALUES (?, ?, NOW())'
         )->execute([$username, $outcome]);
     }
-
     
 
     private function badCountLastMinute(string $username): int {
@@ -121,5 +112,4 @@ class User {
         $stmt->execute([$username]);
         return (int) $stmt->fetchColumn();
     }
-
 }
