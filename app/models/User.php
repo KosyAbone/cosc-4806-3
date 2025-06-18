@@ -24,6 +24,13 @@ class User {
          * $this->auth = true;
          */
   		$username = strtolower($username);
+        //echo '[debug] badCountLastMinute = ' .
+         $this->badCountLastMinute($username) . '<br>';
+        if ($this->badCountLastMinute($username) >= 3) {
+            $_SESSION['auth_msg'] = 'Over 3 attempts. Locked for 60 seconds.';
+            header('Location: /login'); die;
+        }
+        
   		$db = db_connect();
           $statement = $db->prepare("select * from users WHERE username = :name;");
           $statement->bindValue(':name', $username);
@@ -95,9 +102,11 @@ class User {
     private function logAttempt(string $username, string $outcome): void {
         $db = db_connect();
         $db->prepare(
-            'INSERT INTO login_log (username, outcome) VALUES (?, ?)'
+            'INSERT INTO login_log (username, outcome, logged_at)
+             VALUES (?, ?, NOW())'
         )->execute([$username, $outcome]);
     }
+
     
 
     private function badCountLastMinute(string $username): int {
