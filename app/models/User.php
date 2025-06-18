@@ -25,8 +25,9 @@ class User {
          */
   		$username = strtolower($username);
         //echo '[debug] badCountLastMinute = ' .
-         $this->badCountLastMinute($username) . '<br>';
+        $this->badCountLastMinute($username) . '<br>';
         if ($this->badCountLastMinute($username) >= 3) {
+            $_SESSION['locked_until'] = time() + 60;  
             $_SESSION['auth_msg'] = 'Over 3 attempts. Locked for 60 seconds.';
             header('Location: /login'); die;
         }
@@ -40,6 +41,7 @@ class User {
   		if (password_verify($password, $rows['password'])) {
             $this->logAttempt($username, 'good');
   			$_SESSION['auth'] = 1;
+            unset($_SESSION['locked_until']);
   			$_SESSION['username'] = ucwords($username);
   			unset($_SESSION['failedAuth']);
   			header('Location: /home');
