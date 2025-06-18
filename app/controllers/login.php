@@ -10,6 +10,12 @@ class Login extends Controller {
     }
     
     public function verify(){
+			if (isset($_SESSION['locked_until']) && $_SESSION['locked_until'] > time()) {
+					$_SESSION['auth_msg'] = 'You are Locked out. Please wait a few seconds.';
+					header('Location: /login');
+					exit;
+			}
+			
 			$username = $_REQUEST['username'];
 			$password = $_REQUEST['password'];
 		
