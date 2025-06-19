@@ -15,8 +15,8 @@ class Create extends Controller {
             exit;
         }
 
-        $username        = trim($_POST['username'] ?? '');
-        $password        = $_POST['password'] ?? '';
+        $username = trim($_POST['username'] ?? '');
+        $password = $_POST['password'] ?? '';
         $confirmPassword = $_POST['confirm_password'] ?? '';
 
         if ($password !== $confirmPassword) {
