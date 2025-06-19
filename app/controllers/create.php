@@ -5,8 +5,7 @@ class Create extends Controller {
     public function index(){
         $flash = $_SESSION['auth_msg'] ?? null;
         unset($_SESSION['auth_msg']);
-        require 'app/views/create/index.php';
-        // $this->view('create/index', ['flash' => $flash]);
+        $this->view('create/index', ['flash' => $flash]);
     }
 
 

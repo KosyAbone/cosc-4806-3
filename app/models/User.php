@@ -55,11 +55,6 @@ class User {
   public function create(string $username, string $password): array {
       $username = strtolower(trim($username));
 
-      [$ok, $msg] = $this->validatePassword($password);
-      if (!$ok) {
-          return ['ok' => false, 'msg' => $msg];
-      }
-
       // Check if username already exists
       $db   = db_connect();
       $stmt = $db->prepare('SELECT 1 FROM users WHERE username = :u LIMIT 1');
@@ -68,6 +63,12 @@ class User {
       if ($stmt->fetch()) {
           return [ 'ok' => false, 'msg' => 'Username already taken.' ];
       }
+
+      // Check if password pass all the validity rules
+      [$ok, $msg] = $this->validatePassword($password);
+        if (!$ok) {
+            return ['ok' => false, 'msg' => $msg];
+        }
 
       // Insert new user (hashed password!)
       $hash = password_hash($password, PASSWORD_DEFAULT);

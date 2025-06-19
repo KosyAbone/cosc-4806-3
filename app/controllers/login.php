@@ -5,8 +5,7 @@ class Login extends Controller {
     public function index() {
 			$flash = $_SESSION['auth_msg'] ?? null;
 			unset($_SESSION['auth_msg']);
-			require 'app/views/login/index.php';
-	    // $this->view('login/index');
+			$this->view('login/index', ['flash' => $flash]);
     }
     
     public function verify(){
