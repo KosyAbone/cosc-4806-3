@@ -1,4 +1,6 @@
 <?php require_once 'app/views/templates/header.php'; ?>
+<?php
+date_default_timezone_set('America/Toronto'); ?>
 
 <style>
     body {
@@ -47,8 +49,8 @@
 </style>
 
 <div class="container">
-    <h1>Welcome, <?= htmlspecialchars($_SESSION['username'] ?? 'Guest') ?>!</h1>
-    <p class="lead"><?= date("F jS, Y"); ?></p>
+    <h1>Welcome, <?=$_SESSION['username'] ?>!</h1>
+    <p class="lead"><?= date("l, F j, Y, g:i A"); ?></p>
 
     <p>
         <a href="/logout">Logout</a>
